@@ -1,2 +1,3 @@
 BASE
 node_modules
+.env
