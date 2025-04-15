@@ -71,8 +71,6 @@ app.get('/', (req, res) => {
 // Define el puerto y el dominio del servidor.
 const PORT = process.env.PORT || 3001;
 const DOMAIN = process.env.DOMAIN || 'http://localhost:';
-console.log(process.env);
-
 
 // Arranca el servidor y lo pone a escuchar en el puerto especificado.
 app.listen(PORT, () => {
