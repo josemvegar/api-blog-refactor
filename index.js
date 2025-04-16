@@ -62,11 +62,11 @@ app.get('/', (req, res) => {
   res.send('¡Backend del blog funcionando!');
 });
 
-// Importa las rutas relacionadas con los usuarios.
-//const userRoutes = require("./routes/user");
+// Importa las rutas relacionadas con los artículos.
+const articleRoutes = require("./routes/articles");
 
-// Asocia las rutas de usuarios a la ruta base "/api/v1/user".
-//app.use("/api/v1/user", userRoutes);
+// Asocia las rutas de artículos a la ruta base "/api/v1/article".
+app.use("/api/v1/article", articleRoutes);
 
 // Define el puerto y el dominio del servidor.
 const PORT = process.env.PORT || 3001;
