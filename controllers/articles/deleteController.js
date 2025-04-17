@@ -1,11 +1,10 @@
-const updateService = require("../../services/articles/updateService");
+const deleteService = require("../../services/articles/deleteService");
 
 module.exports = async (req, res) => {
     let id = req.params.id;
-    let data = req.body;
 
     try{
-        const serviceResponse = await updateService(id, data);
+        const serviceResponse = await deleteService(id);
 
         return res.status(serviceResponse.code).json(serviceResponse.response);
     }
