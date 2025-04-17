@@ -22,8 +22,8 @@ const validator = require('validator');
  * @property {Function} created_at - Valida que la fecha tenga un formato válido.
  */
 const validations = {
-  title: (value) => validator.isLength(value, { min: 3 }) && validator.isAlphanumeric(value, 'es-ES'),
-  content: (value) => validator.isLength(value, { min: 3 }) && validator.isAlphanumeric(value, 'es-ES'),
+  title: (value) => validator.isLength(value, { min: 3 }),
+  content: (value) => validator.isLength(value, { min: 3 }),
   excerpt: (value) => validator.isLength(value, { min: 3 }) && validator.isAlphanumeric(value, 'es-ES'),
   image: (value) => validator.matches(value, /\.(jpe?g|png|gif|bmp|webp)$/i),
   created_at: (value) => validator.isDate(value),

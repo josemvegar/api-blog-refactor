@@ -24,7 +24,7 @@ module.exports = async (data) => {
         response: {
             status: "success",
             message: "Articulo creado correctamente.",
-            data: articleStoraged
+            article: articleStoraged
         }
     };
 

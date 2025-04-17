@@ -25,10 +25,12 @@ router.get("/test" , (req, res) => {
 const create = require("../controllers/articles/createController");
 router.post("/create" , create);
 
+const update = require("../controllers/articles/updateController");
+router.put("/update/:id?" , update);
+
 /*router.get("/articulos/:ultimos?" , ArticuloController.listar)
 router.get("/articulo/:id" , ArticuloController.unArticulo);
-router.delete("/articulo/:id" , ArticuloController.borrar);
-router.put("/articulo/:id" , ArticuloController.actualizar);*/
+router.delete("/articulo/:id" , ArticuloController.borrar);*/
 
 // En esta ruta indicamos un middleware antes de que se ejecute la ruta, diciendo que_
 //subidas es donde está configurado el multer

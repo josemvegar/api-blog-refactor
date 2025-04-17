@@ -33,6 +33,14 @@ ArticleSchema.statics.storageArticle = function(data) {
     return article.save();
 };
 
+ArticleSchema.statics.updateArticle = function(id, data) {
+    return this.findOneAndUpdate({_id: id}, data, {new: true}).exec();
+};
+
+ArticleSchema.statics.idExist = function(id) {
+    return this.findById(id).exec();
+};
+
 ArticleSchema.statics.findAllArticles = (paginationPage, itemsPerPage, page) => {
   return this.paginate({page: page}, {page: paginationPage, limit: itemsPerPage, sort: { created_at: -1 }});
 }
