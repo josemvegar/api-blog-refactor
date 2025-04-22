@@ -31,8 +31,11 @@ router.put("/update/:id?" , update);
 const _delete = require("../controllers/articles/deleteController");
 router.delete("/delete/:id?" , _delete);
 
-/*router.get("/articulos/:ultimos?" , ArticuloController.listar)
-router.get("/articulo/:id" , ArticuloController.unArticulo);*/
+const listAll = require("../controllers/articles/listAllController");
+router.get("/list/:page?" , listAll);
+
+const listOne = require("../controllers/articles/listOneController");
+router.get("/one/:id?" , listOne);
 
 // En esta ruta indicamos un middleware antes de que se ejecute la ruta, diciendo que_
 //subidas es donde está configurado el multer

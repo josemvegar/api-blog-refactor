@@ -45,9 +45,12 @@ ArticleSchema.statics.deleteArticle = function(id) {
     return this.findByIdAndDelete(id).exec();
 };
 
-ArticleSchema.statics.findAllArticles = (paginationPage, itemsPerPage, page) => {
-  return this.paginate({page: page}, {page: paginationPage, limit: itemsPerPage, sort: { created_at: -1 }});
-}
+ArticleSchema.statics.findAllArticles = function(page, itemsPerPage) {
+  return this.paginate({}, {page: page, limit: itemsPerPage, sort: { created_at: -1 }});
+};
 
+ArticleSchema.statics.findOneArticle = function(id) {
+    return this.findById(id).exec();
+};
 
 module.exports = model("Article", ArticleSchema, "articles");
