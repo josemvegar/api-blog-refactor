@@ -53,4 +53,8 @@ ArticleSchema.statics.findOneArticle = function(id) {
     return this.findById(id).exec();
 };
 
+ArticleSchema.statics.updateImage = function(id, image) {
+    return this.findOneAndUpdate({_id: id}, {image: image}, {new: true});
+};
+
 module.exports = model("Article", ArticleSchema, "articles");
