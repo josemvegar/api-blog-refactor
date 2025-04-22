@@ -25,7 +25,6 @@ const getFile = async (req, res) => {
 
     try{
         const serviceResponse = await getFileService(file, uploadsPath);
-        console.log(serviceResponse);
 
         if(typeof serviceResponse === 'object' && serviceResponse !== null && serviceResponse.status === 'error'){
             return res.status(serviceResponse.code).json(serviceResponse.response);
