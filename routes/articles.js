@@ -32,6 +32,7 @@ router.post("/upload/:id?", articleUpload.single("file0"), upload);
 router.get("/image/:file?" , getFile);
 
 // BUSCADOR
-/*router.get("/buscar/:key" , ArticuloController.buscador);*/
+const searchController = require("../controllers/articles/searchController");
+router.get("/search/:key" , searchController);
 
 module.exports = router;

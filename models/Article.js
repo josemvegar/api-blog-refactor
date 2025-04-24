@@ -21,7 +21,7 @@ const ArticleSchema = Schema({
     },
     created_at: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
 });
 
@@ -55,6 +55,15 @@ ArticleSchema.statics.findOneArticle = function(id) {
 
 ArticleSchema.statics.updateImage = function(id, image) {
     return this.findOneAndUpdate({_id: id}, {image: image}, {new: true});
+};
+
+ArticleSchema.statics.searchArticle = function(key) {
+    return this.find({
+        "$or": [
+            {title: {"$regex": key, "$options": "i"}},
+            {content: {"$regex": key, "$options": "i"}}
+        ]
+    }, null, { sort: { created_at: -1 } }).exec();
 };
 
 module.exports = model("Article", ArticleSchema, "articles");
