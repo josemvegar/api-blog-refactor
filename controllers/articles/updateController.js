@@ -1,22 +1,28 @@
+/**
+ * @file updateController.js
+ * @description Controlador para actualizar artículos
+ * @module controllers/articles/updateController
+ * @requires ../../services/articles/updateService
+ */
+
 const updateService = require("../../services/articles/updateService");
 
+/**
+ * Actualiza un artículo por ID
+ * @async
+ * @function
+ * @param {express.Request} req - Request HTTP
+ * @param {express.Response} res - Response HTTP
+ */
 module.exports = async (req, res) => {
-    let id = req.params.id;
-    let data = req.body;
-
-    try{
-        const serviceResponse = await updateService(id, data);
-
+    try {
+        const serviceResponse = await updateService(req.params.id, req.body);
         return res.status(serviceResponse.code).json(serviceResponse.response);
-    }
-    catch (error) {
-        console.log(error);
+    } catch (error) {
+        console.error('[updateController] Error:', error);
         return res.status(500).json({
             status: "error",
-            message: "Error en el servidor"
+            message: "Error al actualizar el artículo"
         });
     }
-    
-
-
 };

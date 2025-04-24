@@ -1,63 +1,98 @@
 /**
  * @file dataValidator.js
- * @description Módulo para validar los datos de entrada utilizando la librería Validator.
+ * @description Módulo para validar datos de artículos usando Validator.js y reglas personalizadas
  * @module helpers/dataValidator
+ * @requires validator
  */
 
-// Importa la librería Validator para realizar validaciones de datos.
 const validator = require('validator');
+const { isURL } = require('validator');
 
 /**
- * Objeto que contiene las funciones de validación para cada campo.
- * @name validations
+ * @typedef ValidationRules
  * @type {Object}
- * @property {Function} name - Valida que el nombre tenga al menos 3 caracteres y sea alfanumérico.
- * @property {Function} surname - Valida que el apellido tenga al menos 3 caracteres y sea alfanumérico.
- * @property {Function} nick - Valida que el nick tenga al menos 3 caracteres y sea alfanumérico.
- * @property {Function} email - Valida que el correo electrónico tenga un formato válido.
- * @property {Function} password - Valida que la contraseña tenga al menos 8 caracteres y sea fuerte.
- * @property {Function} role - Valida que el rol sea uno de los permitidos: 'role_admin' o 'role_user'.
- * @property {Function} image - Valida que el nombre de la imagen sea alfanumérico.
- * @property {Function} imagePath - Valida que la ruta de la imagen sea alfanumérica.
- * @property {Function} created_at - Valida que la fecha tenga un formato válido.
+ * @property {Function} title - Valida el título del artículo
+ * @property {Function} content - Valida el contenido del artículo
+ * @property {Function} excerpt - Valida el extracto del artículo
+ * @property {Function} image - Valida el nombre/URL de la imagen
+ * @property {Function} created_at - Valida la fecha de creación
+ */
+
+/**
+ * Reglas de validación para artículos
+ * @type {ValidationRules}
  */
 const validations = {
-  title: (value) => validator.isLength(value, { min: 3 }),
-  content: (value) => validator.isLength(value, { min: 3 }),
-  excerpt: (value) => validator.isLength(value, { min: 3 }) && validator.isAlphanumeric(value, 'es-ES'),
-  image: (value) => validator.matches(value, /\.(jpe?g|png|gif|bmp|webp)$/i),
-  created_at: (value) => validator.isDate(value),
+  title: (value) => 
+    validator.isLength(value, { min: 5, max: 120 }) &&
+    !validator.contains(value, '<script>'),
+
+  content: (value) => 
+    validator.isLength(value, { min: 50 }) &&
+    !validator.contains(value, '<script>'),
+
+  excerpt: (value) => 
+    validator.isLength(value, { max: 200 }) &&
+    !validator.contains(value, '<script>'),
+
+  image: (value) => 
+    validator.matches(value, /\.(jpe?g|png|gif|webp)$/i) ||
+    isURL(value, { protocols: ['http', 'https'], require_protocol: true }),
+
+  created_at: (value) => 
+    validator.isISO8601(value) || 
+    validator.isDate(value, { format: 'YYYY-MM-DD' })
 };
 
 /**
- * Valida los datos de entrada según las reglas definidas en el objeto `validations`.
- * @name dataValidator
+ * Mensajes de error personalizados para cada regla
+ * @type {Object}
+ */
+const errorMessages = {
+  title: 'Debe tener entre 5-120 caracteres y no contener scripts',
+  content: 'Debe tener al menos 50 caracteres y no contener scripts',
+  excerpt: 'Máximo 200 caracteres y no contener scripts',
+  image: 'Debe ser una imagen válida (jpg/png/gif/webp) o URL',
+  created_at: 'Debe ser una fecha válida (formato: YYYY-MM-DD o ISO8601)'
+};
+
+/**
+ * Valida los datos de un artículo según las reglas definidas
  * @function
- * @param {Object} data - Objeto que contiene los datos a validar.
- * @returns {Array|boolean} - Devuelve un array de mensajes de error si hay campos inválidos, o `true` si todos los campos son válidos.
+ * @param {Object} data - Datos del artículo a validar
+ * @returns {Object} Resultado de la validación
+ * @property {boolean} isValid - Indica si la validación fue exitosa
+ * @property {Array<string>} [errors] - Mensajes de error (solo si isValid es false)
+ * 
  * @example
- * // Ejemplo de uso:
- * const data = { name: "Juan", email: "juan@example.com", password: "Password123" };
- * const result = dataValidator(data);
- * if (result !== true) {
- *   console.log("Errores de validación:", result);
- * } else {
- *   console.log("Datos válidos.");
+ * const result = dataValidator({
+ *   title: "Mi artículo",
+ *   content: "Contenido aquí..."
+ * });
+ * 
+ * if (!result.isValid) {
+ *   console.error(result.errors);
  * }
  */
 const dataValidator = (data) => {
-  // Reduce los campos del objeto `data` a un array de mensajes de error.
-  const reasons = Object.keys(data).reduce((acc, key) => {
-    // Si el campo tiene una validación definida y no pasa la validación, se añade un mensaje de error.
-    if (validations[key] && !validations[key](data[key])) {
-      acc.push(`El campo ${key} no es válido.`);
+  const errors = Object.keys(validations).reduce((acc, key) => {
+    if (data[key] !== undefined && !validations[key](data[key])) {
+      acc.push({
+        field: key,
+        value: data[key],
+        message: errorMessages[key]
+      });
     }
     return acc;
   }, []);
 
-  // Si hay mensajes de error, se devuelven. De lo contrario, se devuelve `true`.
-  return reasons.length > 0 ? reasons : true;
+  return {
+    isValid: errors.length === 0,
+    ...(errors.length > 0 && { errors })
+  };
 };
 
-// Exporta la función `dataValidator` para que pueda ser utilizada en otros archivos.
-module.exports = { dataValidator };
+module.exports = { 
+  dataValidator,
+  articleValidationRules: validations // Exportar reglas para uso externo
+};

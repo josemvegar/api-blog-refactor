@@ -1,78 +1,93 @@
 /**
  * @file index.js
- * @description Punto de entrada de la aplicación. Configura y arranca el servidor Express.
- * @module index
+ * @description Configura e inicia el servidor Express con todos sus middleware y rutas
+ * @module /
+ * @requires express
+ * @requires dotenv
+ * @requires cors
+ * @requires ./database/conection
+ * @requires morgan
+ * @requires ./middlewares/errorHandler
  */
 
-// Importa Express para crear el servidor.
+// Configuración inicial
 const express = require('express');
-
-// Importa dotenv para cargar variables de entorno desde un archivo .env.
 const dotenv = require('dotenv');
-
-// Importa CORS para permitir solicitudes desde diferentes dominios.
-const cors = require("cors");
-
-// Importa la clase Database para manejar la conexión a la base de datos.
-const Database = require("./database/conection");
-
-// Importa Morgan para registrar las solicitudes HTTP en la consola.
+const cors = require('cors');
+const Database = require('./database/conection');
 const morgan = require('morgan');
-
-// Importa el middleware para manejar errores globales.
 const errorHandler = require('./middlewares/errorHandler');
 
-// Conecta a la base de datos.
-Database.connect();
-
-// Carga las variables de entorno definidas en el archivo .env.
-dotenv.config();
-
-// Crea una instancia de la aplicación Express.
-const app = express();
-
-// Middleware para manejar errores globales.
-app.use(errorHandler);
-
-// Middleware para registrar las solicitudes HTTP en la consola.
-app.use(morgan('dev'));
-
-// Middleware para permitir solicitudes desde diferentes dominios.
-app.use(cors());
-
-// Middleware para parsear el cuerpo de las solicitudes en formato JSON.
-app.use(express.json());
-
-// Middleware para parsear el cuerpo de las solicitudes en formato URL-encoded.
-app.use(express.urlencoded({ extended: true }));
+// Inicialización de configuraciones
+dotenv.config();  // Carga variables de entorno primero
+Database.connect(); // Establece conexión con la base de datos
 
 /**
- * Ruta de prueba para verificar que el servidor está funcionando.
- * @name get/
+ * Instancia principal de la aplicación Express
+ * @type {express.Application}
+ */
+const app = express();
+
+// ======================
+// Configuración de Middlewares
+// ======================
+
+// Middleware para manejo centralizado de errores (debe ir primero)
+app.use(errorHandler);
+
+// Middleware para logging de solicitudes HTTP
+app.use(morgan('dev'));
+
+// Middleware para habilitar CORS (Cross-Origin Resource Sharing)
+app.use(cors());
+
+// Middlewares para parseo de cuerpos de solicitud
+app.use(express.json());       // Para application/json
+app.use(express.urlencoded({  // Para application/x-www-form-urlencoded
+  extended: true
+}));
+
+// ======================
+// Definición de Rutas
+// ======================
+
+/**
+ * Ruta raíz de verificación de estado
+ * @name GET /
  * @function
- * @param {Object} req - Objeto de solicitud HTTP.
- * @param {Object} res - Objeto de respuesta HTTP.
- * @returns {string} - Mensaje de confirmación de que el servidor está funcionando.
- * @example
- * // Ejemplo de solicitud:
- * // GET /
- * // Respuesta: "¡Backend funcionando!"
+ * @memberof module:server
+ * @param {express.Request} req - Objeto de solicitud HTTP
+ * @param {express.Response} res - Objeto de respuesta HTTP
+ * @returns {string} Mensaje de estado del servidor
  */
 app.get('/', (req, res) => {
   res.send('¡Backend del blog funcionando!');
 });
 
-// Importa las rutas relacionadas con los artículos.
-const articleRoutes = require("./routes/articles");
+// Rutas de artículos
+const articleRoutes = require('./routes/articles');
+app.use('/api/v1/article', articleRoutes);  // Prefijo para API v1
 
-// Asocia las rutas de artículos a la ruta base "/api/v1/article".
-app.use("/api/v1/article", articleRoutes);
+// ======================
+// Inicialización del Servidor
+// ======================
 
-// Define el puerto y el dominio del servidor.
+/**
+ * Puerto del servidor (de entorno o 3001 por defecto)
+ * @type {number}
+ */
 const PORT = process.env.PORT || 3001;
+
+/**
+ * Dominio del servidor (de entorno o localhost por defecto)
+ * @type {string}
+ */
 const DOMAIN = process.env.DOMAIN || 'http://localhost:';
 
-// Arranca el servidor y lo pone a escuchar en el puerto especificado.
+/**
+ * Inicia el servidor Express
+ * @listens PORT
+ */
 app.listen(PORT, () => {
   console.log(`Backend corriendo en ${DOMAIN}${PORT}`);
 });

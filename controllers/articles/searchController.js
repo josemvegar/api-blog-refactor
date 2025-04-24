@@ -1,18 +1,28 @@
+/**
+ * @file searchController.js
+ * @description Controlador para búsqueda de artículos
+ * @module controllers/articles/searchController
+ * @requires ../../services/articles/searchService
+ */
+
 const searchService = require('../../services/articles/searchService');
 
+/**
+ * Busca artículos por término
+ * @async
+ * @function
+ * @param {express.Request} req - Request HTTP
+ * @param {express.Response} res - Response HTTP
+ */
 module.exports = async (req, res) => {
-    const { key } = req.params;
-
-    try{
-        const serviceResponse = await searchService(key);
-
+    try {
+        const serviceResponse = await searchService(req.params.key);
         return res.status(serviceResponse.code).json(serviceResponse.response);
-    }
-    catch (error) {
-        console.log(error);
+    } catch (error) {
+        console.error('[searchController] Error:', error);
         return res.status(500).json({
             status: "error",
-            message: "Error en el servidor"
+            message: "Error al realizar la búsqueda"
         });
     }
-}
+};

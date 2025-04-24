@@ -1,34 +1,60 @@
 /**
  * @file errorHandler.js
- * @description Middleware para manejar errores globales de la aplicación.
+ * @description Middleware avanzado para manejo centralizado de errores
  * @module middlewares/errorHandler
  */
 
 /**
- * Middleware para manejar errores globales.
- * @name errorHandler
+ * Middleware para manejo de errores globales
  * @function
- * @param {Error} err - Objeto de error.
- * @param {Object} req - Objeto de solicitud HTTP.
- * @param {Object} res - Objeto de respuesta HTTP.
- * @param {Function} next - Función para pasar al siguiente middleware.
- * @returns {Object} Respuesta JSON con el estado y mensaje de error.
+ * @param {Error} err - Objeto de error
+ * @param {express.Request} req - Objeto de solicitud HTTP
+ * @param {express.Response} res - Objeto de respuesta HTTP
+ * @param {Function} next - Función para pasar al siguiente middleware
+ * @returns {Object} Respuesta JSON estandarizada
+ * 
  * @example
- * // Ejemplo de uso en Express:
+ * // En app.js:
  * app.use(errorHandler);
- *
- * // Si ocurre un error en cualquier ruta, se manejará aquí.
+ * 
+ * // En controladores:
+ * try { ... } catch(err) { next(err); }
  */
 const errorHandler = (err, req, res, next) => {
-    // Registra el error en la consola para depuración.
-    console.error(err.stack);
-  
-    // Envía una respuesta de error al cliente.
-    res.status(500).send({
-      status: "error",
-      message: err.message || "Error interno del servidor.",
-    });
+  // 1. Logging del error (mejorado)
+  console.error(`[${new Date().toISOString()}] Error en ${req.method} ${req.path}:`, {
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      body: process.env.NODE_ENV === 'development' ? req.body : undefined
+  });
+
+  // 2. Determinar el código de estado HTTP
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Error interno del servidor';
+
+  // 3. Manejo de errores específicos
+  if (err.name === 'ValidationError') {
+      statusCode = 400;
+      message = 'Error de validación';
+  } else if (err.code === 'LIMIT_FILE_SIZE') {
+      statusCode = 413;
+      message = 'El archivo excede el tamaño máximo permitido';
+  }
+
+  // 4. Construir respuesta de error
+  const errorResponse = {
+      status: 'error',
+      code: statusCode,
+      message,
+      ...(process.env.NODE_ENV === 'development' && {
+          error: err.message,
+          stack: err.stack,
+          type: err.name
+      })
   };
-  
-  // Exporta el middleware para que pueda ser utilizado en la aplicación.
-  module.exports = errorHandler;
+
+  // 5. Enviar respuesta
+  res.status(statusCode).json(errorResponse);
+};
+
+module.exports = errorHandler;

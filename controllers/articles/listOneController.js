@@ -1,19 +1,28 @@
-const {listOne} = require("../../services/articles/listService");
+/**
+ * @file listOneController.js
+ * @description Controlador para obtener un artículo específico
+ * @module controllers/articles/listOneController
+ * @requires ../../services/articles/listService
+ */
 
+const { listOne } = require("../../services/articles/listService");
+
+/**
+ * Obtiene un artículo por ID
+ * @async
+ * @function
+ * @param {express.Request} req - Request HTTP
+ * @param {express.Response} res - Response HTTP
+ */
 module.exports = async (req, res) => {
-
-    const { id } = req.params;
-
-    try{
-        const serviceResponse = await listOne(id);
-
+    try {
+        const serviceResponse = await listOne(req.params.id);
         return res.status(serviceResponse.code).json(serviceResponse.response);
-    }
-    catch (error) {
-        console.log(error);
+    } catch (error) {
+        console.error('[listOneController] Error:', error);
         return res.status(500).json({
             status: "error",
-            message: "Error en el servidor"
+            message: "Error al obtener el artículo"
         });
     }
 };
