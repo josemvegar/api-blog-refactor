@@ -18,13 +18,6 @@ const Article = require('../models/Article');
  * @property {boolean} isValid - Indica si el ID es válido y existe
  * @property {string|null} [error] - Mensaje de error (solo si isValid es false)
  * @property {string} [errorType] - Tipo de error ('missing', 'format' o 'existence')
- * 
- * @example
- * // Ejemplo de uso:
- * const validation = await idValidator('5f8d0d55b54764421b7156c3');
- * if (!validation.isValid) {
- *   console.error(validation.error);
- * }
  */
 module.exports = async (id) => {
     // Validación 1: Presencia del ID

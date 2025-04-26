@@ -7,9 +7,9 @@
  * @requires ../../models/Article
  */
 
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const idValidator = require("../../helpers/idValidator");
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const createErrorResponse = require('../../helpers/createErrorResponse');
+const idValidator = require('../../helpers/idValidator');
 
 /**
  * Servicio para eliminar un artículo
@@ -26,47 +26,43 @@ const Article = require("../../models/Article");
  * }
  */
 module.exports = async (id) => {
-    // 1. Validar el ID
     const idValidation = await idValidator(id);
     if (!idValidation.isValid) {
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            idValidation.error || "ID inválido",
+            idValidation.error || 'ID inválido',
             { errorType: idValidation.errorType }
         );
     }
 
     try {
-        // 2. Eliminar el artículo
-        const articleDeleted = await Article.deleteArticle(id);
-        
+        const articleDeleted = await articleRepository.delete(id);
+
         if (!articleDeleted) {
             return createErrorResponse(
-                "error",
+                'error',
                 404,
-                "El artículo no existe o ya fue eliminado"
+                'El artículo no existe o ya fue eliminado'
             );
         }
 
-        // 3. Retornar respuesta exitosa
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
-                message: "Artículo eliminado correctamente",
+                status: 'success',
+                message: 'Artículo eliminado correctamente',
                 deletedId: articleDeleted._id,
                 deletedAt: new Date()
             }
         };
-
     } catch (error) {
-        console.error("[deleteService] Error:", error);
+        console.error('[deleteService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al eliminar el artículo",
+            'Error al eliminar el artículo',
             process.env.NODE_ENV === 'development' ? { error: error.message } : null
         );
     }

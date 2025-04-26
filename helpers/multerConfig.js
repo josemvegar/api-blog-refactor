@@ -16,7 +16,7 @@ const fs = require('fs');
  * @function
  * @param {string} folderName - Nombre de subcarpeta en ./uploads/
  * @param {string} [filePrefix='file'] - Prefijo para nombres de archivo
- * @returns {multer.Multer} Instancia configurada de Multer
+ * @returns {import('multer').Multer} Instancia configurada de Multer
  * 
  * @example
  * // Uso básico:

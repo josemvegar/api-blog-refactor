@@ -11,15 +11,14 @@
  * @requires ../../models/Article
  */
 
-const { dataValidator } = require("../../helpers/dataValidator");
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const idValidator = require("../../helpers/idValidator");
-const deleteUploadedFile = require("../../helpers/deleteUploadedFile");
-const path = require("path");
-const fs = require("fs").promises; // Usamos la versión con promesas
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const { dataValidator } = require('../../helpers/dataValidator');
+const createErrorResponse = require('../../helpers/createErrorResponse');
+const idValidator = require('../../helpers/idValidator');
+const deleteUploadedFile = require('../../helpers/deleteUploadedFile');
+const path = require('path');
+const fs = require('fs').promises;
 
-// Configuración de rutas
 const UPLOADS_PATH = path.join(__dirname, '../../uploads/articles/');
 
 /**
@@ -43,9 +42,9 @@ const setFileService = async (id, fileData) => {
     // 1. Validar presencia de archivo
     if (!fileData || !fileData.filename) {
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            "No se recibió ningún archivo válido"
+            'No se recibió ningún archivo válido'
         );
     }
 
@@ -54,9 +53,9 @@ const setFileService = async (id, fileData) => {
     if (!idValidation.isValid) {
         await deleteUploadedFile(fileData.filename, UPLOADS_PATH);
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            idValidation.error || "ID de artículo inválido",
+            idValidation.error || 'ID de artículo inválido',
             { errorType: idValidation.errorType }
         );
     }
@@ -66,10 +65,10 @@ const setFileService = async (id, fileData) => {
     if (!fileNameValidation.isValid) {
         await deleteUploadedFile(fileData.filename, UPLOADS_PATH);
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            "Nombre de archivo no válido",
-            { 
+            'Nombre de archivo no válido',
+            {
                 validationErrors: fileNameValidation.errors,
                 receivedName: fileData.originalname
             }
@@ -78,24 +77,24 @@ const setFileService = async (id, fileData) => {
 
     try {
         // 4. Actualizar artículo en la base de datos
-        const articleUpdated = await Article.updateImage(id, fileData.filename);
-        
+        const articleUpdated = await articleRepository.updateImage(id, fileData.filename);
+
         if (!articleUpdated) {
             await deleteUploadedFile(fileData.filename, UPLOADS_PATH);
             return createErrorResponse(
-                "error",
+                'error',
                 404,
-                "El artículo no existe o no pudo actualizarse"
+                'El artículo no existe o no pudo actualizarse'
             );
         }
 
         // 5. Retornar respuesta exitosa
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
-                message: "Imagen del artículo actualizada correctamente",
+                status: 'success',
+                message: 'Imagen del artículo actualizada correctamente',
                 article: {
                     id: articleUpdated._id,
                     title: articleUpdated.title,
@@ -104,16 +103,15 @@ const setFileService = async (id, fileData) => {
                 }
             }
         };
-
     } catch (error) {
         // Limpieza en caso de error
         await deleteUploadedFile(fileData.filename, UPLOADS_PATH);
-        console.error("[setFileService] Error:", error);
+        console.error('[setFileService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al actualizar la imagen del artículo",
-            process.env.NODE_ENV === 'development' ? { 
+            'Error al actualizar la imagen del artículo',
+            process.env.NODE_ENV === 'development' ? {
                 error: error.message,
                 stack: error.stack
             } : null
@@ -136,9 +134,9 @@ const setFileService = async (id, fileData) => {
 const getFileService = async (file, uploadsPath = UPLOADS_PATH) => {
     if (!file || typeof file !== 'string') {
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            "Nombre de archivo no válido"
+            'Nombre de archivo no válido'
         );
     }
 
@@ -149,24 +147,23 @@ const getFileService = async (file, uploadsPath = UPLOADS_PATH) => {
         // Verificar que la ruta está dentro del directorio permitido
         if (!absolutePath.startsWith(path.resolve(uploadsPath))) {
             return createErrorResponse(
-                "error",
+                'error',
                 403,
-                "Acceso al archivo no permitido"
+                'Acceso al archivo no permitido'
             );
         }
 
         // Verificar existencia y permisos de lectura
         await fs.access(absolutePath, fs.constants.F_OK | fs.constants.R_OK);
         return absolutePath;
-
     } catch (error) {
-        console.error("[getFileService] Error:", error);
+        console.error('[getFileService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             404,
-            "El archivo solicitado no existe",
-            process.env.NODE_ENV === 'development' ? { 
-                attemptedPath: path.join(uploadsPath, file) 
+            'El archivo solicitado no existe',
+            process.env.NODE_ENV === 'development' ? {
+                attemptedPath: path.join(uploadsPath, file)
             } : null
         );
     }

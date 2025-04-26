@@ -63,16 +63,6 @@ const errorMessages = {
  * @returns {Object} Resultado de la validación
  * @property {boolean} isValid - Indica si la validación fue exitosa
  * @property {Array<string>} [errors] - Mensajes de error (solo si isValid es false)
- * 
- * @example
- * const result = dataValidator({
- *   title: "Mi artículo",
- *   content: "Contenido aquí..."
- * });
- * 
- * if (!result.isValid) {
- *   console.error(result.errors);
- * }
  */
 const dataValidator = (data) => {
   const errors = Object.keys(validations).reduce((acc, key) => {

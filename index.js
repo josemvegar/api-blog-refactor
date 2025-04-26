@@ -55,9 +55,9 @@ app.use(express.urlencoded({  // Para application/x-www-form-urlencoded
  * Ruta raíz de verificación de estado
  * @name GET /
  * @function
- * @memberof module:server
- * @param {express.Request} req - Objeto de solicitud HTTP
- * @param {express.Response} res - Objeto de respuesta HTTP
+ * @memberof module:/
+ * @param {import('express').Request} req - Objeto de solicitud HTTP
+ * @param {import('express').Response} res - Objeto de respuesta HTTP
  * @returns {string} Mensaje de estado del servidor
  */
 app.get('/', (req, res) => {
@@ -86,7 +86,7 @@ const DOMAIN = process.env.DOMAIN || 'http://localhost:';
 
 /**
  * Inicia el servidor Express
- * @listens PORT
+ * @listens {number} PORT - Puerto en el que escucha el servidor
  */
 app.listen(PORT, () => {
   console.log(`Backend corriendo en ${DOMAIN}${PORT}`);

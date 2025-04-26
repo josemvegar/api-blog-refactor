@@ -4,13 +4,12 @@
  * @module services/articles/listService
  * @requires ../../helpers/createErrorResponse
  * @requires ../../helpers/idValidator
- * @requires ../../models/Article
  * @requires dotenv
  */
 
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const idValidator = require("../../helpers/idValidator");
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const createErrorResponse = require('../../helpers/createErrorResponse');
+const idValidator = require('../../helpers/idValidator');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -29,7 +28,7 @@ dotenv.config();
 const listAll = async (page = 1) => {
     // Configuración desde .env
     const ITEMS_PER_PAGE = parseInt(process.env.ITEMS_PER_PAGE) || 10;
-    const DOMAIN = process.env.DOMAIN || "http://localhost:";
+    const DOMAIN = process.env.DOMAIN || 'http://localhost:';
     const PORT = process.env.PORT || 3001;
     const LIST_USER_URL = process.env.LIST_USER_URL || '/api/v1/article/list/';
     const BASE_URL = `${DOMAIN}${PORT}${LIST_USER_URL}`;
@@ -38,26 +37,25 @@ const listAll = async (page = 1) => {
         // Validar y normalizar página
         page = Math.max(1, parseInt(page) || 1);
 
-        const articles = await Article.findAllArticles(page, ITEMS_PER_PAGE);
+        const articles = await articleRepository.findAll(page, ITEMS_PER_PAGE);
 
         if (!articles || articles.totalDocs === 0 || articles.docs.length === 0) {
             return createErrorResponse(
-                "error", 
-                404, 
-                "No hay artículos disponibles",
-                { suggestion: "Intenta con una página diferente" }
+                'error',
+                404,
+                'No hay artículos disponibles',
+                { suggestion: 'Intenta con una página diferente' }
             );
         }
 
         // Construir URLs para paginación
-        const buildPageUrl = (pageNum) => 
-            `${BASE_URL}${pageNum}`;
+        const buildPageUrl = (pageNum) => `${BASE_URL}${pageNum}`;
 
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
+                status: 'success',
                 totalItems: articles.totalDocs,
                 itemsPerPage: ITEMS_PER_PAGE,
                 currentPage: articles.page,
@@ -73,13 +71,12 @@ const listAll = async (page = 1) => {
                 }))
             }
         };
-
     } catch (error) {
-        console.error("[listAllService] Error:", error);
+        console.error('[listAllService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al obtener los artículos",
+            'Error al obtener los artículos',
             process.env.NODE_ENV === 'development' ? { error: error.message } : null
         );
     }
@@ -102,30 +99,30 @@ const listOne = async (id) => {
         const idValidation = await idValidator(id);
         if (!idValidation.isValid) {
             return createErrorResponse(
-                "error",
+                'error',
                 400,
-                idValidation.error || "ID inválido",
+                idValidation.error || 'ID inválido',
                 { errorType: idValidation.errorType }
             );
         }
 
         // Buscar artículo
-        const article = await Article.findOneArticle(id);
+        const article = await articleRepository.findById(id);
         if (!article) {
             return createErrorResponse(
-                "error",
+                'error',
                 404,
-                "El artículo solicitado no existe",
-                { suggestion: "Verifica el ID o intenta con otro artículo" }
+                'El artículo solicitado no existe',
+                { suggestion: 'Verifica el ID o intenta con otro artículo' }
             );
         }
 
         // Formatear respuesta
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
+                status: 'success',
                 article: {
                     id: article._id,
                     title: article.title,
@@ -138,17 +135,14 @@ const listOne = async (id) => {
         };
 
     } catch (error) {
-        console.error("[listOneService] Error:", error);
+        console.error('[listOneService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al obtener el artículo",
+            'Error al obtener el artículo',
             process.env.NODE_ENV === 'development' ? { error: error.message } : null
         );
     }
 };
 
-module.exports = {
-    listAll,
-    listOne
-};
+module.exports = { listAll, listOne };

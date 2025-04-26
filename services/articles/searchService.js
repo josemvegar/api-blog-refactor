@@ -6,8 +6,8 @@
  * @requires ../../models/Article
  */
 
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const createErrorResponse = require('../../helpers/createErrorResponse');
 
 /**
  * Servicio para buscar artículos por término
@@ -27,23 +27,23 @@ module.exports = async (key) => {
     // Validación básica del término de búsqueda
     if (!key || typeof key !== 'string' || key.trim().length < 3) {
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            "El término de búsqueda debe tener al menos 3 caracteres"
+            'El término de búsqueda debe tener al menos 3 caracteres'
         );
     }
 
     try {
-        const searchResult = await Article.searchArticle(key.trim());
+        const searchResult = await articleRepository.search(key.trim());
 
         if (searchResult.length === 0) {
             return createErrorResponse(
-                "error",
+                'error',
                 404,
-                "No se encontraron artículos",
-                { 
-                    suggestion: "Intenta con términos diferentes",
-                    searchedTerm: key 
+                'No se encontraron artículos',
+                {
+                    suggestion: 'Intenta con términos diferentes',
+                    searchedTerm: key
                 }
             );
         }
@@ -61,10 +61,10 @@ module.exports = async (key) => {
         }));
 
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
+                status: 'success',
                 message: `Búsqueda: "${key}"`,
                 total: searchResult.length,
                 results: formattedResults
@@ -72,11 +72,11 @@ module.exports = async (key) => {
         };
 
     } catch (error) {
-        console.error("[searchService] Error:", error);
+        console.error('[searchService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al realizar la búsqueda",
+            'Error al realizar la búsqueda',
             process.env.NODE_ENV === 'development' ? { error: error.message } : null
         );
     }

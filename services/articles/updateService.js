@@ -8,10 +8,10 @@
  * @requires ../../models/Article
  */
 
-const { dataValidator } = require("../../helpers/dataValidator");
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const idValidator = require("../../helpers/idValidator");
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const { dataValidator } = require('../../helpers/dataValidator');
+const createErrorResponse = require('../../helpers/createErrorResponse');
+const idValidator = require('../../helpers/idValidator');
 
 /**
  * Servicio para actualizar un artículo existente
@@ -33,50 +33,46 @@ const Article = require("../../models/Article");
  * });
  */
 module.exports = async (id, data) => {
-    // 1. Validar ID del artículo
     const idValidation = await idValidator(id);
     if (!idValidation.isValid) {
         return createErrorResponse(
-            "error",
+            'error',
             400,
-            idValidation.error || "ID inválido",
+            idValidation.error || 'ID inválido',
             { errorType: idValidation.errorType }
         );
     }
 
-    // 2. Validar datos de actualización
     const dataValidation = dataValidator(data);
     if (!dataValidation.isValid) {
         return createErrorResponse(
-            "error",
-            422, // 422 Unprocessable Entity
-            "Datos de actualización no válidos",
-            { 
+            'error',
+            422,
+            'Datos de actualización no válidos',
+            {
                 validationErrors: dataValidation.errors,
-                receivedData: data 
+                receivedData: data
             }
         );
     }
 
     try {
-        // 3. Actualizar artículo
-        const articleUpdated = await Article.updateArticle(id, data);
-        
+        const articleUpdated = await articleRepository.update(id, data);
+
         if (!articleUpdated) {
             return createErrorResponse(
-                "error",
+                'error',
                 404,
-                "El artículo no existe o no pudo actualizarse"
+                'El artículo no existe o no pudo actualizarse'
             );
         }
 
-        // 4. Retornar respuesta exitosa
         return {
-            status: "success",
+            status: 'success',
             code: 200,
             response: {
-                status: "success",
-                message: "Artículo actualizado correctamente",
+                status: 'success',
+                message: 'Artículo actualizado correctamente',
                 article: {
                     id: articleUpdated._id,
                     title: articleUpdated.title,
@@ -86,14 +82,13 @@ module.exports = async (id, data) => {
                 }
             }
         };
-
     } catch (error) {
-        console.error("[updateService] Error:", error);
+        console.error('[updateService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al actualizar el artículo",
-            process.env.NODE_ENV === 'development' ? { 
+            'Error al actualizar el artículo',
+            process.env.NODE_ENV === 'development' ? {
                 error: error.message,
                 stack: error.stack
             } : null

@@ -1,5 +1,5 @@
 /**
- * @file article.js
+ * @file Article.js
  * @description Modelo Mongoose para artículos con métodos estáticos personalizados
  * @module models/Article
  * @requires mongoose

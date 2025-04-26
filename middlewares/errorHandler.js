@@ -8,10 +8,10 @@
  * Middleware para manejo de errores globales
  * @function
  * @param {Error} err - Objeto de error
- * @param {express.Request} req - Objeto de solicitud HTTP
- * @param {express.Response} res - Objeto de respuesta HTTP
+ * @param {import('express').Request} req - Objeto de solicitud HTTP
+ * @param {import('express').Response} res - Objeto de respuesta HTTP
  * @param {Function} next - Función para pasar al siguiente middleware
- * @returns {Object} Respuesta JSON estandarizada
+ * @returns {void}
  * 
  * @example
  * // En app.js:

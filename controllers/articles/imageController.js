@@ -13,8 +13,9 @@ const path = require("path");
  * Sube una imagen para un artículo
  * @async
  * @function
- * @param {express.Request} req - Request HTTP
- * @param {express.Response} res - Response HTTP
+ * @param {import('express').Request} req - Objeto de solicitud HTTP
+ * @param {import('express').Response} res - Objeto de respuesta HTTP
+ * @returns {Promise<import('express').Response>} Respuesta HTTP con formato estándar
  */
 const upload = async (req, res) => {
     try {
@@ -33,8 +34,9 @@ const upload = async (req, res) => {
  * Obtiene una imagen de artículo
  * @async
  * @function
- * @param {express.Request} req - Request HTTP
- * @param {express.Response} res - Response HTTP
+ * @param {import('express').Request} req - Objeto de solicitud HTTP
+ * @param {import('express').Response} res - Objeto de respuesta HTTP
+ * @returns {Promise<import('express').Response>} Respuesta HTTP con formato estándar
  */
 const getFile = async (req, res) => {
     const uploadsPath = path.join(__dirname, '../../uploads/articles/');

@@ -8,10 +8,10 @@
  * @requires ../../models/Article
  */
 
-const { dataValidator } = require("../../helpers/dataValidator");
-const emptyChecker = require("../../helpers/emptyChecker");
-const createErrorResponse = require("../../helpers/createErrorResponse");
-const Article = require("../../models/Article");
+const articleRepository = require('../../repositories/articleRepository');
+const { dataValidator } = require('../../helpers/dataValidator');
+const emptyChecker = require('../../helpers/emptyChecker');
+const createErrorResponse = require('../../helpers/createErrorResponse');
 
 /**
  * Servicio para crear un nuevo artículo
@@ -34,39 +34,34 @@ const Article = require("../../models/Article");
  * });
  */
 module.exports = async (data) => {
-    // 1. Validar campos obligatorios
-    const emptyCheck = emptyChecker(data, ["title", "content"]);
+    const emptyCheck = emptyChecker(data, ['title', 'content']);
     if (!emptyCheck.isValid) {
         return createErrorResponse(
-            "error", 
-            400, 
-            "Campos requeridos faltantes", 
+            'error',
+            400,
+            'Campos requeridos faltantes',
             { missingFields: emptyCheck.missingFields }
         );
     }
 
-    // 2. Validar formato de datos
     const dataValidation = dataValidator(data);
     if (!dataValidation.isValid) {
         return createErrorResponse(
-            "error",
-            422, // 422 Unprocessable Entity
-            "Datos no válidos",
+            'error',
+            422,
+            'Datos no válidos',
             { validationErrors: dataValidation.errors }
         );
     }
 
     try {
-        // 3. Crear y almacenar el artículo
-        const articleStoraged = await Article.storageArticle(data);
-
-        // 4. Retornar respuesta exitosa
+        const articleStoraged = await articleRepository.create(data);
         return {
-            status: "success",
-            code: 201, // 201 Created
+            status: 'success',
+            code: 201,
             response: {
-                status: "success",
-                message: "Artículo creado correctamente",
+                status: 'success',
+                message: 'Artículo creado correctamente',
                 article: {
                     id: articleStoraged._id,
                     title: articleStoraged.title,
@@ -76,13 +71,12 @@ module.exports = async (data) => {
                 }
             }
         };
-
     } catch (error) {
-        console.error("[createService] Error:", error);
+        console.error('[createService] Error:', error);
         return createErrorResponse(
-            "error",
+            'error',
             500,
-            "Error al crear el artículo",
+            'Error al crear el artículo',
             process.env.NODE_ENV === 'development' ? { error: error.message } : null
         );
     }

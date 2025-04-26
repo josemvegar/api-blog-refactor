@@ -2,6 +2,8 @@
  * @file conection.js
  * @description Maneja la conexión a la base de datos MongoDB utilizando Mongoose.
  * @module database/conection
+ * @requires mongoose
+ * @requires dotenv
  */
 
 // Importa Mongoose para interactuar con MongoDB.
@@ -21,20 +23,16 @@ const MONGO_DB = process.env.MONGO_DB || "";
  * Clase que maneja la conexión a la base de datos.
  * @class Database
  */
+
+/**
+ * Conecta a la base de datos MongoDB.
+ * @name connect
+ * @function
+ * @static
+ * @async
+ * @throws {Error} Si no se puede conectar a la base de datos.
+ */
 class Database {
-  /**
-   * Conecta a la base de datos MongoDB.
-   * @name connect
-   * @function
-   * @static
-   * @async
-   * @throws {Error} Si no se puede conectar a la base de datos.
-   * @example
-   * // Ejemplo de uso:
-   * Database.connect()
-   *   .then(() => console.log("Conectado a la base de datos."))
-   *   .catch((error) => console.error("Error de conexión:", error.message));
-   */
   static async connect() {
     try {
       // Intenta conectar a la base de datos utilizando la URL proporcionada.

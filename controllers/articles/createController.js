@@ -19,10 +19,9 @@ const createService = require('../../services/articles/createService');
  * Controlador para creación de artículos
  * @async
  * @function
- * @param {express.Request} req - Objeto de solicitud HTTP
- * @param {ArticleData} req.body - Datos del artículo a crear
- * @param {express.Response} res - Objeto de respuesta HTTP
- * @returns {Promise<express.Response>} Respuesta HTTP con formato estándar
+ * @param {import('express').Request} req - Objeto de solicitud HTTP
+ * @param {import('express').Response} res - Objeto de respuesta HTTP
+ * @returns {Promise<import('express').Response>} Respuesta HTTP con formato estándar
  * @throws {Error} Si ocurre un error no controlado (500 Internal Server Error)
  * 
  * @example
