@@ -36,7 +36,9 @@ const app = express();
 app.use(errorHandler);
 
 // Middleware para logging de solicitudes HTTP
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 
 // Middleware para habilitar CORS (Cross-Origin Resource Sharing)
 app.use(cors());
@@ -88,6 +90,13 @@ const DOMAIN = process.env.DOMAIN || 'http://localhost:';
  * Inicia el servidor Express
  * @listens {number} PORT - Puerto en el que escucha el servidor
  */
-app.listen(PORT, () => {
-  console.log(`Backend corriendo en ${DOMAIN}${PORT}`);
-});
+// Exporta solo la app si estamos en entorno de test
+if (process.env.NODE_ENV === 'test') {
+  module.exports = app;
+} else {
+  const server = app.listen(PORT, () => {
+    console.log(`Backend corriendo en ${process.env.DOMAIN || 'http://localhost:'}${PORT}`);
+  });
+  
+  module.exports = { app, server };
+}

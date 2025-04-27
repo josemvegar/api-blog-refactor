@@ -39,7 +39,10 @@ class Database {
       await mongoose.connect(MONGO_DB);
 
       // Si la conexión es exitosa, se muestra un mensaje en la consola.
-      console.log("Base de datos conectada.");
+      if (process.env.NODE_ENV !== 'test') {
+        console.log("Base de datos conectada.");
+      }
+      
     } catch (error) {
       // Si ocurre un error, se registra en la consola y se lanza una excepción.
       console.log(error);
