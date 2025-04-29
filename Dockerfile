@@ -1,20 +1,24 @@
-# Imagen base de Node.js
-FROM node:23-slim
-
-# Establece el directorio de trabajo en el contenedor
+# Stage 1 - Builder (para pruebas e instalación)
+FROM node:23-slim AS builder
 WORKDIR /app
-
-# Copia los archivos de dependencias
 COPY package*.json ./
-
-# Instala dependencias
 RUN npm install
-
-# Copia el resto del código
 COPY . .
 
-# Expone el puerto para Railway
-EXPOSE 3001
+# Ejecuta los tests (si fallan, detiene el build)
+RUN npm test
 
-# Comando para iniciar la app
+# Stage 2 - Producción (imagen final liviana)
+FROM node:23-slim
+WORKDIR /app
+
+# Copia solo lo necesario desde el builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app .
+
+# Variables de entorno para producción
+ENV NODE_ENV=production
+
+EXPOSE 3001
 CMD ["npm", "start"]

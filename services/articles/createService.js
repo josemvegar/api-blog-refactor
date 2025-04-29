@@ -32,7 +32,7 @@ const createErrorResponse = require('../../helpers/createErrorResponse');
  *   content: "Contenido detallado...",
  *   excerpt: "Resumen breve"
  * });
- */
+ */  
 module.exports = async (data) => {
     const emptyCheck = emptyChecker(data, ['title', 'content']);
     if (!emptyCheck.isValid) {
@@ -40,7 +40,8 @@ module.exports = async (data) => {
             'error',
             400,
             'Campos requeridos faltantes',
-            { missingFields: emptyCheck.missingFields }
+            { missingFields: emptyCheck.missingFields,
+              emptyFields: emptyCheck.emptyFields }
         );
     }
 
@@ -65,6 +66,7 @@ module.exports = async (data) => {
                 article: {
                     id: articleStoraged._id,
                     title: articleStoraged.title,
+                    content: articleStoraged.content,
                     excerpt: articleStoraged.excerpt,
                     image: articleStoraged.image,
                     created_at: articleStoraged.created_at
@@ -72,7 +74,9 @@ module.exports = async (data) => {
             }
         };
     } catch (error) {
-        console.error('[createService] Error:', error);
+        if (process.env.NODE_ENV !== 'test'){
+            console.error('[createService] Error:', error);
+        }
         return createErrorResponse(
             'error',
             500,

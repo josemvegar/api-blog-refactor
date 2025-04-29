@@ -1,12 +1,6 @@
 const request = require('supertest');
 const app = require('../../../index');
 
-// Mockea el servicio que usa el controlador
-//jest.mock('../../../services/articles/listService');
-
-const listAllController = require('../../../controllers/articles/listAllController');
-const listAllArticleService = require('../../../services/articles/listService');
-
 describe('listArticles controller', () => {
 
     it('should return paginated articles', async () => {
@@ -17,7 +11,16 @@ describe('listArticles controller', () => {
         expect(response.body.articles).toBeInstanceOf(Array);
     });
 
-  it('should return 404 with an empty array for a very high page number', async () => {
+    it('should return paginated articles from page 1 with an invalid page param like a string', async () => {
+        const response = await request(app).get('/api/v1/article/list/invalid');
+        
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe('success');
+        expect(response.body.currentPage).toBe(1);
+        expect(response.body.articles).toBeInstanceOf(Array);
+    });
+
+    it('should return 404 with an empty array for a very high page number', async () => {
         const response = await request(app).get('/api/v1/article/list/99999999999');
 
         expect(response.status).toBe(404);
