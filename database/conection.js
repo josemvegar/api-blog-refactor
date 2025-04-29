@@ -45,7 +45,7 @@ class Database {
       
     } catch (error) {
       // Si ocurre un error, se registra en la consola y se lanza una excepción.
-      console.log(error);
+      console.log(error, 'StringConection: ', MONGO_DB);
       throw new Error("No se ha podido conectar a la Base de datos.");
     }
   }
