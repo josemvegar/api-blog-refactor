@@ -6,7 +6,7 @@ jest.mock('../../models/Article');
 
 describe('idValidator', () => {
     it('should validate a correct MongoDB ID', async () => {
-        const validId = mongoose.Types.ObjectId().toString();
+        const validId = '680989aa8dedc34f62e4e0a7';
         Article.idExist.mockResolvedValue(true);
         const result = await idValidator(validId);
         expect(result.isValid).toBe(true);
@@ -26,7 +26,7 @@ describe('idValidator', () => {
     });
 
     it('should return error for non-existent ID', async () => {
-        const validId = mongoose.Types.ObjectId().toString();
+        const validId = '680989aa8dedc34f62e4e0a7';
         Article.idExist.mockResolvedValue(false);
         const result = await idValidator(validId);
         expect(result.isValid).toBe(false);

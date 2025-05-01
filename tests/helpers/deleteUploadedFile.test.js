@@ -4,24 +4,31 @@ const path = require('path');
 
 jest.mock('fs');
 
-const uploadsPath = path.join(__dirname, '../../uploads');
+jest.mock('fs', () => ({
+    promises: {
+        stat: jest.fn(),
+        unlink: jest.fn()
+    }
+}));
+
+const uploadsPath = path.join(__dirname, '../../uploads/articles/');
 
 describe('deleteUploadedFile', () => {
     it('should not delete default.jpg', async () => {
-        await deleteUploadedFile('default.jpg', uploadsPath);
-        expect(fs.promises.unlink).not.toHaveBeenCalled();
+        const result = await deleteUploadedFile('default.jpg', uploadsPath);
+        expect(result).toBe(false);
     });
 
     it('should delete a valid file', async () => {
-        fs.existsSync.mockReturnValue(true);
+        fs.promises.stat.mockReturnValue(true);
         fs.promises.unlink.mockResolvedValue();
-        await deleteUploadedFile('test.jpg', uploadsPath);
+        const result = await deleteUploadedFile('test.jpg', uploadsPath);
         expect(fs.promises.unlink).toHaveBeenCalledWith(path.join(uploadsPath, 'test.jpg'));
     });
 
     it('should handle non-existent files gracefully', async () => {
-        fs.existsSync.mockReturnValue(false);
-        await deleteUploadedFile('nonexistent.jpg', uploadsPath);
-        expect(fs.promises.unlink).not.toHaveBeenCalled();
+        fs.promises.stat.mockRejectedValue(new Error('File not found'));
+        const result = await deleteUploadedFile('nonexistent.jpg', uploadsPath);
+        expect(result).toBe(false);
     });
 });

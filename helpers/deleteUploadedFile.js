@@ -4,10 +4,13 @@
  * @module helpers/deleteUploadedFile
  * @requires fs
  * @requires path
+ * @requires dotenv
  */
 
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config();
 
 /**
  * Elimina un archivo subido al servidor de forma asíncrona con manejo de errores
@@ -29,21 +32,31 @@ const path = require('path');
  */
 module.exports = async (filename, uploadsPath) => {
     // Validación de parámetros
-    if (!filename || filename === 'default.jpg') return;
+    if (!filename || filename === 'default.jpg') return false; // No eliminar el archivo por defecto
     if (!uploadsPath) throw new Error('La ruta de uploads es requerida');
 
     const filePath = path.join(uploadsPath, filename);
     
     try {
         // Verificación sincrónica de existencia
-        if (!fs.existsSync(filePath)) {
-            console.warn(`[DeleteFile] Archivo no encontrado: ${filename}`);
-            return;
+        //const fileExists = await fs.existsSync(filePath);
+        try {
+            await fs.promises.stat(filePath);
+        } catch (error) {
+            if (process.env.NODE_ENV !== 'test') {
+                console.warn(`[DeleteFile] Archivo no encontrado: ${filename}`);
+            }
+            return false; // Retorna falso si el archivo no existe
         }
+        
 
         // Eliminación asíncrona con promesa
         await fs.promises.unlink(filePath);
-        console.log(`[DeleteFile] Archivo eliminado: ${filename}`);
+        if (process.env.NODE_ENV !== 'test') {
+            console.log(`[DeleteFile] Archivo eliminado: ${filename}`);
+        }
+
+        return true;
 
     } catch (error) {
         console.error(`[DeleteFile] Error eliminando ${filename}:`, error);
