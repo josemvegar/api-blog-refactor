@@ -30,7 +30,7 @@ module.exports = async (id) => {
     if (!idValidation.isValid) {
         return createErrorResponse(
             'error',
-            400,
+            idValidation.code,
             idValidation.error || 'ID inválido',
             { errorType: idValidation.errorType }
         );
@@ -58,7 +58,9 @@ module.exports = async (id) => {
             }
         };
     } catch (error) {
-        console.error('[deleteService] Error:', error);
+        if (process.env.NODE_ENV !== 'test') {
+            console.error('[deleteService] Error:', error);
+        }
         return createErrorResponse(
             'error',
             500,

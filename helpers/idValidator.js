@@ -24,6 +24,7 @@ module.exports = async (id) => {
     if (!id || typeof id !== 'string') {
         return {
             isValid: false,
+            code: 400,
             error: 'Debes enviar un ID válido',
             errorType: 'missing'
         };
@@ -34,6 +35,7 @@ module.exports = async (id) => {
     if (!isValidFormat) {
         return {
             isValid: false,
+            code: 422,
             error: 'Formato de ID incorrecto (debe ser 24 caracteres hexadecimal)',
             errorType: 'format'
         };
@@ -45,6 +47,7 @@ module.exports = async (id) => {
         if (!exists) {
             return {
                 isValid: false,
+                code: 404,
                 error: 'El artículo solicitado no existe',
                 errorType: 'existence'
             };
